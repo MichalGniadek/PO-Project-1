@@ -1,6 +1,6 @@
 package simulation;
 
-public class EnergyChart extends DisplayChart
+public class EnergyChart extends ChartDisplay
         implements ITotalEnergyChanged, IAnimalSpawnedObserver, IAnimalDiedObserver{
     private int animals = 0;
     private int totalEnergy = 0;

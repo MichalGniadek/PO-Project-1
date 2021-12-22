@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class Genome {
-    private int[] genes;
+    private final int[] genes;
 
     public Genome(Random rand){
         genes = new int[32];
@@ -22,6 +22,7 @@ public class Genome {
             else
                 genes[31 - i] = (i < splitIndex) ? g0.genes[31 - i] : g1.genes[31 - i];
         }
+        Arrays.sort(genes);
     }
 
     public int getRandom(Random rand){

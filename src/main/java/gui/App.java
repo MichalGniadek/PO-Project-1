@@ -3,6 +3,7 @@ package gui;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import simulation.ISimulationStarted;
 import simulation.Simulation;
@@ -27,11 +28,21 @@ public class App extends Application implements ISimulationStarted {
     @Override
     public void SimulationStarted(Configuration configuration) {
         Platform.runLater(() -> {
-            var simulation = configuration.InitSimulation();
-            simulations.add(simulation);
-            var simulationThread = new Thread(simulation);
-            simulationThread.start();
-            mainScene.rootProperty().set(simulation.GetRoot());
+            var simulations = configuration.InitSimulations();
+            this.simulations.addAll(simulations);
+
+            for(var simulation : simulations){
+                var simulationThread = new Thread(simulation);
+                simulationThread.start();
+            }
+
+            var box = new HBox();
+
+            for(var simulation : simulations){
+                box.getChildren().add(simulation.GetRoot());
+            }
+
+            mainScene.rootProperty().set(box);
         });
     }
 

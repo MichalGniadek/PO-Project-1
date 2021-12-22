@@ -1,6 +1,6 @@
 package simulation;
 
-public class CountChart extends DisplayChart implements
+public class CountChart extends ChartDisplay implements
         IAnimalSpawnedObserver, IAnimalDiedObserver, IGrassCountChanged {
     private int animalCount = 0;
     private int grassCount = 0;

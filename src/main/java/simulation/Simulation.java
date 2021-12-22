@@ -7,7 +7,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +36,32 @@ public class Simulation implements Runnable{
         var step_button = new Button("Step");
         step_button.setOnAction(ev -> status = SimulationStatus.RunOnce);
 
-        var control_box = new HBox(start_button, pause_button, step_button);
+        var csv_button = new Button("Save statistics");
+        csv_button.setOnAction(ev -> {
+            var previousStatus = status;
+            status = SimulationStatus.Paused;
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            var dir = directoryChooser.showDialog(new Stage());
+            status = previousStatus;
+
+            var data = new CSVData();
+            for(var display : displayList){
+                data.union(display.getCSVData());
+            }
+            var csv = data.toString();
+
+            try {
+                var file = new File(dir, "stats.csv");
+                BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+                writer.write(csv);
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        var control_box = new HBox(start_button, pause_button, step_button,
+                newDisplay("Selected animal", new SelectedAnimalDisplay(map)), csv_button);
         control_box.setSpacing(5);
         control_box.setAlignment(Pos.CENTER);
 
@@ -45,7 +77,7 @@ public class Simulation implements Runnable{
 
         displayBox.getChildren().set(0, displayList.get(0).getNode());
 
-        root = new VBox(map.getGrid(), control_box, display_control_box, displayBox);
+        root = new VBox(map.getNode(), control_box, display_control_box, displayBox);
         root.setSpacing(10);
     }
 
@@ -75,7 +107,7 @@ public class Simulation implements Runnable{
             if(status == SimulationStatus.Running || status == SimulationStatus.RunOnce) {
                 Platform.runLater(() -> {
                     map.runTurn();
-                    map.updateGrid();
+                    map.updateNode();
                     for(var d : displayList) d.update();
                 });
             }

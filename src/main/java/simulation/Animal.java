@@ -3,6 +3,7 @@ package simulation;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,15 +24,27 @@ public class Animal {
     private int childrenCount = 0;
     private final Genome genome;
 
-    List<ITotalEnergyChanged> totalEnergyChangedObservers = new ArrayList<>();
+    private boolean isSelected = false;
+    private boolean highlightNextDraw = false;
 
-    public Animal(Random rand, int startEnergy, int moveEnergy){
+    List<ITotalEnergyChanged> totalEnergyChangedObservers = new ArrayList<>();
+    List<IAnimalSelected> animalSelectedObservers = new ArrayList<>();
+
+    public Animal(Random rand, int startEnergy, int moveEnergy, Genome genome){
         this.rand = rand;
         this.direction = Direction.GetRandom();
         this.moveEnergy = moveEnergy;
         this.startEnergy = startEnergy;
         this.energy = startEnergy;
-        this.genome = new Genome(rand);
+        this.genome = genome;
+    }
+
+    public Animal(Random rand, int startEnergy, int moveEnergy){
+        this(rand, startEnergy, moveEnergy, new Genome(rand));
+    }
+
+    public Animal(Animal clone){
+        this(clone.rand, clone.startEnergy, clone.moveEnergy, clone.genome);
     }
 
     public Animal(Random rand, Animal stronger, Animal weaker){
@@ -54,6 +67,18 @@ public class Animal {
     public void addEnergyObserver(ITotalEnergyChanged observer){
         totalEnergyChangedObservers.add(observer);
         observer.totalEnergyChanged(energy);
+    }
+
+    public void addSelectedObserver(IAnimalSelected observer){
+        animalSelectedObservers.add(observer);
+    }
+
+    public void setSelection(boolean selected){
+        isSelected = selected;
+    }
+
+    public void highlightNextDraw(){
+        highlightNextDraw = true;
     }
 
     public boolean isDead(){
@@ -123,9 +148,17 @@ public class Animal {
             case NORTH_WEST -> imageView.setRotate(315);
         }
 
-        var saturation = Math.min(energy, startEnergy * 1.5) / (startEnergy * 1.5);
-        imageView.setEffect(new ColorAdjust(0.1, saturation * 0.8 + 0.2,
-                -0.2,0.0));
+        var hue = highlightNextDraw ? -0.6 : isSelected ? 1 : 0.1;
+        var saturation = Math.min(energy, startEnergy * 1.5) / (startEnergy * 1.5) * 0.8 + 0.2;
+        imageView.setEffect(new ColorAdjust(hue, saturation, -0.2,0.0));
+
+        highlightNextDraw = false;
+
+        imageView.setPickOnBounds(true);
+        imageView.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            for(var observer : animalSelectedObservers) observer.animalSelected(this);
+            event.consume();
+        });
 
         return imageView;
     }

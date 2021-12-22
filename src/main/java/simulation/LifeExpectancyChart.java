@@ -1,6 +1,6 @@
 package simulation;
 
-public class LifeExpectancyChart extends DisplayChart implements IAnimalDiedObserver{
+public class LifeExpectancyChart extends ChartDisplay implements IAnimalDiedObserver{
     private int deadAnimals = 0;
     private int totalLife = 0;
 

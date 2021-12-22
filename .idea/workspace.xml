@@ -4,8 +4,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ebfce1e1-9fb3-42df-b027-3ec58b002a6d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="ebfce1e1-9fb3-42df-b027-3ec58b002a6d" name="Changes" comment="Setup, simulation and charts">
+      <change afterPath="$PROJECT_DIR$/src/main/java/simulation/CSVData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/simulation/ChartDisplay.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/simulation/IAnimalSelected.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/simulation/SelectedAnimalDisplay.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gui/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gui/App.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gui/Configuration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gui/Configuration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/simulation/Animal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/simulation/Animal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/simulation/AverageChildrenChart.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/simulation/AverageChildrenChart.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/simulation/CountChart.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/simulation/CountChart.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/simulation/Display.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/simulation/Display.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/simulation/DisplayChart.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/simulation/EnergyChart.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/simulation/EnergyChart.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/simulation/Genome.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/simulation/Genome.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/simulation/GenomeDisplay.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/simulation/GenomeDisplay.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/simulation/LifeExpectancyChart.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/simulation/LifeExpectancyChart.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/simulation/Simulation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/simulation/Simulation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/simulation/WorldMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/simulation/WorldMap.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,7 +69,9 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="226FgTnzThsVvCdZnwLc3dzWKnO" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="flattenPackages" value="true" />
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -106,6 +125,14 @@
       <option name="presentableId" value="Default" />
       <updated>1639150243523</updated>
     </task>
+    <task id="LOCAL-00001" summary="Setup, simulation and charts">
+      <created>1639875665107</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1639875665107</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -118,5 +145,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Setup, simulation and charts" />
+    <option name="LAST_COMMIT_MESSAGE" value="Setup, simulation and charts" />
   </component>
 </project>

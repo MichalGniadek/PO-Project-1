@@ -20,30 +20,45 @@ public class Configuration {
 
     private final Spinner<Integer> width = new Spinner<>(5, 100, 17);
     private final Spinner<Integer> height = new Spinner<>(5, 100, 17);
-    private final CheckBox wraps = new CheckBox("Wraps?");
-    private final Spinner<Integer> jungleRatio = new Spinner<>(0, 100, 20);
-    private final Spinner<Integer> plantEnergy = new Spinner<>(0, 100, 10);
+    private final Spinner<Integer> jungleRatio = new Spinner<>(0, 100, 30);
+    private final Spinner<Integer> plantEnergy = new Spinner<>(0, 100, 15);
 
     private final Spinner<Integer> startAnimals = new Spinner<>(1, 100, 10);
-    private final Spinner<Integer> startEnergy = new Spinner<>(1, 100000, 50);
+    private final Spinner<Integer> startEnergy = new Spinner<>(1, 100000, 70);
     private final Spinner<Integer> moveEnergy = new Spinner<>(1, 100000, 1);
 
+    private final CheckBox leftWraps = new CheckBox("Left wraps?");
+    private final CheckBox rightWraps = new CheckBox("Right wraps?");
+    private final CheckBox rightMap = new CheckBox("Create right map?");
+
+    private final CheckBox leftMagic = new CheckBox("Left magic evolution?");
+    private final CheckBox rightMagic = new CheckBox("Right magic evolution?");
+    private final CheckBox leftMap = new CheckBox("Create left map?");
+
     public Configuration(){
-        var start_button = new Button("Start simulation");
+        var start_button = new Button("Start simulations");
         start_button.setOnAction(ev -> {
             for (var observer: simulationStartedObservers)
                 observer.SimulationStarted(this);
         });
 
+        leftWraps.setSelected(true);
+        leftMap.setSelected(true);
+
         root = new VBox(
                 new Label("Select configuration"),
                 DisplayBox(new Label("Size"), new Label("X:"), width, new Label("Y:"), height),
-                wraps,
                 DisplayBox(new Label("Jungle ratio:"), jungleRatio),
                 DisplayBox(new Label("Plant energy:"), plantEnergy),
                 DisplayBox(new Label("Starting animals:"), startAnimals),
                 DisplayBox(new Label("Starting energy:"), startEnergy),
                 DisplayBox(new Label("Move energy:"), moveEnergy),
+                leftWraps,
+                rightWraps,
+                leftMagic,
+                rightMagic,
+                leftMap,
+                rightMap,
                 start_button
         );
         root.setAlignment(Pos.CENTER);
@@ -65,11 +80,24 @@ public class Configuration {
         return root;
     }
 
-    public Simulation InitSimulation(){
-        var map = new WorldMap(new Vector2d(width.getValue(), height.getValue()),
-                wraps.isSelected(), jungleRatio.getValue(),
-                startAnimals.getValue(), startEnergy.getValue(), moveEnergy.getValue(),
-                plantEnergy.getValue());
-        return new Simulation(map);
+    public List<Simulation> InitSimulations(){
+        List<Simulation> simulations = new ArrayList<>();
+        if(leftMap.isSelected()){
+            simulations.add(new Simulation(new WorldMap(
+                    new Vector2d(width.getValue(), height.getValue()),
+                    leftWraps.isSelected(), jungleRatio.getValue(),
+                    startAnimals.getValue(), startEnergy.getValue(), moveEnergy.getValue(),
+                    plantEnergy.getValue(), leftMagic.isSelected()
+            )));
+        }
+        if(rightMap.isSelected()){
+            simulations.add(new Simulation(new WorldMap(
+                    new Vector2d(width.getValue(), height.getValue()),
+                    rightWraps.isSelected(), jungleRatio.getValue(),
+                    startAnimals.getValue(), startEnergy.getValue(), moveEnergy.getValue(),
+                    plantEnergy.getValue(), rightMagic.isSelected()
+            )));
+        }
+        return simulations;
     }
 }

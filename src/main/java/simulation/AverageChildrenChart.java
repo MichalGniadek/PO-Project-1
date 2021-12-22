@@ -1,6 +1,6 @@
 package simulation;
 
-public class AverageChildrenChart extends DisplayChart implements IAnimalDiedObserver, IAnimalSpawnedObserver{
+public class AverageChildrenChart extends ChartDisplay implements IAnimalDiedObserver, IAnimalSpawnedObserver{
     private int aliveAnimals = 0;
     private int totalChildren = 0;
 

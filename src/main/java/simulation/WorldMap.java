@@ -1,14 +1,13 @@
 package simulation;
 
 import javafx.geometry.HPos;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.*;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,6 +26,10 @@ public class WorldMap {
     private final Map<Vector2d, List<Animal>> animals = new HashMap<>();
     private final int plantEnergy;
 
+    private final int maxMagicEvolution;
+    private int currentMagicEvolution = 0;
+    private final Label magicEvolutionLabel = new Label("");
+
     private final Set<Vector2d> grass = new HashSet<>();
 
     private final GridPane grid = new GridPane();
@@ -35,76 +38,89 @@ public class WorldMap {
     private final List<IAnimalSpawnedObserver> animalsReproduceObservers = new ArrayList<>();
     private final List<IGrassCountChanged> grassCountChangedObservers = new ArrayList<>();
     private final List<ITotalEnergyChanged> totalEnergyChangedObservers = new ArrayList<>();
+    private final List<IAnimalSelected> animalSelectedObservers = new ArrayList<>();
 
-    public WorldMap(Vector2d size, boolean wraps, int jungleRatio,
-                    int numberOfAnimals, int startEnergy, int moveEnergy, int plantEnergy) {
+    public WorldMap(Vector2d size, boolean wraps, int jungleRatio, int numberOfAnimals,
+                    int startEnergy, int moveEnergy, int plantEnergy, boolean magicEvolution) {
         this.size = size;
         this.wraps = wraps;
 
-        for (int i = 0; i < numberOfAnimals; i++){
+        for (int i = 0; i < numberOfAnimals; i++) {
 
             Vector2d pos;
-            do{
+            do {
                 pos = new Vector2d(rand.nextInt(size.x), rand.nextInt(size.y));
-            } while(occupiedByAnimals(pos));
+            } while (occupiedByAnimals(pos));
 
             var animal = new Animal(rand, startEnergy, moveEnergy);
-            for(var obs : totalEnergyChangedObservers) animal.addEnergyObserver(obs);
             addAnimal(animal, pos);
+            initNewAnimal(animal, null, null);
         }
         this.plantEnergy = plantEnergy;
 
-        this.jungleSize = (int)Math.sqrt((double)(size.x * size.y * jungleRatio) / 100);
-        this.jungleStart = new Vector2d(size.x / 2 - jungleSize/2, size.y / 2 - jungleSize/2);
+        this.jungleSize = (int) Math.sqrt((double) (size.x * size.y * jungleRatio) / 100);
+        this.jungleStart = new Vector2d(size.x / 2 - jungleSize / 2, size.y / 2 - jungleSize / 2);
 
-        for(int i = 0; i < jungleSize * jungleSize / 2; i++) spawnGrass();
+        for (int i = 0; i < jungleSize * jungleSize / 2; i++) spawnGrass();
+
+        if (magicEvolution) maxMagicEvolution = 3;
+        else maxMagicEvolution = 0;
     }
 
-    public void addObserver(Object observer){
-        if (observer instanceof IAnimalDiedObserver){
+    public void addObserver(Object observer) {
+        if (observer instanceof IAnimalDiedObserver) {
             animalDiedObservers.add((IAnimalDiedObserver) observer);
         }
-        if (observer instanceof IAnimalSpawnedObserver){
+        if (observer instanceof IAnimalSpawnedObserver) {
             animalsReproduceObservers.add((IAnimalSpawnedObserver) observer);
-            for(var animals : animals.values()){
-                for(var animal : animals){
+            for (var animals : animals.values()) {
+                for (var animal : animals) {
                     ((IAnimalSpawnedObserver) observer)
                             .animalSpawned(null, null, animal);
                 }
             }
         }
-        if(observer instanceof IGrassCountChanged){
+        if (observer instanceof IGrassCountChanged) {
             grassCountChangedObservers.add((IGrassCountChanged) observer);
             ((IGrassCountChanged) observer).grassCountChanged(grass.size());
         }
-        if(observer instanceof ITotalEnergyChanged){
+        if (observer instanceof ITotalEnergyChanged) {
             totalEnergyChangedObservers.add((ITotalEnergyChanged) observer);
-            for(var animals : animals.values()){
-                for(var animal : animals){
+            for (var animals : animals.values()) {
+                for (var animal : animals) {
                     animal.addEnergyObserver((ITotalEnergyChanged) observer);
+                }
+            }
+        }
+        if (observer instanceof IAnimalSelected) {
+            animalSelectedObservers.add((IAnimalSelected) observer);
+            for (var animals : animals.values()) {
+                for (var animal : animals) {
+                    animal.addSelectedObserver((IAnimalSelected) observer);
                 }
             }
         }
     }
 
-    public void runTurn(){
+    public void runTurn() {
         removeDeadAnimals();
         moveAnimals();
         eatAndReproduceAnimals();
+        handleMagicEvolution();
 
-        for(var animals : animals.values()) animals.sort(Animal::compareEnergy);
+        for (var animals : animals.values()) animals.sort(Animal::compareEnergy);
 
         spawnGrass();
     }
 
-    private void removeDeadAnimals(){
+    private void removeDeadAnimals() {
         for (var animals : animals.values()) {
             var iter = animals.iterator();
-            while(iter.hasNext()){
+            while (iter.hasNext()) {
                 var animal = iter.next();
-                if(animal.isDead()){
+                if (animal.isDead()) {
                     iter.remove();
-                    for(var obs : animalDiedObservers) {
+                    for (var obs : animalDiedObservers) {
                         obs.animalDied(animal);
                     }
                 }
@@ -112,31 +128,31 @@ public class WorldMap {
         }
     }
 
-    private void moveAnimals(){
+    private void moveAnimals() {
         var movedAnimals = new ArrayList<Animal>();
         var movedPositions = new ArrayList<Vector2d>();
 
-        for (var entry: animals.entrySet()) {
+        for (var entry : animals.entrySet()) {
             var position = entry.getKey();
             var iter = entry.getValue().iterator();
-            while(iter.hasNext()){
+            while (iter.hasNext()) {
                 var animal = iter.next();
                 var move = animal.move();
                 var newPosition = position.add(move);
 
-                if(wraps){
+                if (wraps) {
                     newPosition = new Vector2d(
                             (newPosition.x + size.x) % size.x,
                             (newPosition.y + size.y) % size.y
                     );
-                }else{
+                } else {
                     newPosition = new Vector2d(
                             Math.max(0, Math.min(size.x - 1, newPosition.x)),
                             Math.max(0, Math.min(size.y - 1, newPosition.y))
                     );
                 }
 
-                if(!newPosition.equals(position)) {
+                if (!newPosition.equals(position)) {
                     iter.remove();
                     movedAnimals.add(animal);
                     movedPositions.add(newPosition);
@@ -144,53 +160,54 @@ public class WorldMap {
             }
         }
 
-        for(int i = 0; i < movedAnimals.size(); i++)
+        for (int i = 0; i < movedAnimals.size(); i++)
             addAnimal(movedAnimals.get(i), movedPositions.get(i));
     }
 
-    private void eatAndReproduceAnimals(){
-        for (var entry: animals.entrySet()) {
+    private void eatAndReproduceAnimals() {
+        for (var entry : animals.entrySet()) {
             var position = entry.getKey();
             var animals = entry.getValue();
 
-            //TODO grass should be shared between all strongest animals
-            if (animals.size() > 0 && grass.contains(position)){
-                animals.get(0).feed(plantEnergy);
+            if (animals.size() > 0 && grass.contains(position)) {
+                var maxEnergy = animals.get(0).getEnergy();
+                var topAnimals = animals.stream()
+                        .filter(a -> a.getEnergy() == maxEnergy).toList();
+                var energy = plantEnergy / topAnimals.size();
+                for (var animal : topAnimals) animal.feed(energy);
                 grass.remove(position);
-                for(var obs: grassCountChangedObservers) obs.grassCountChanged(-1);
+                for (var obs : grassCountChangedObservers) obs.grassCountChanged(-1);
             }
 
-            if (animals.size() > 1){
+            if (animals.size() > 1) {
                 var iter = animals.iterator();
                 var first = iter.next();
                 var second = iter.next();
-                if(first.canReproduce() && second.canReproduce()){
+                if (first.canReproduce() && second.canReproduce()) {
                     var child = new Animal(rand, first, second);
                     addAnimal(child, position);
-                    for(var obs : totalEnergyChangedObservers) child.addEnergyObserver(obs);
-                    for(var obs : animalsReproduceObservers)
-                        obs.animalSpawned(first, second, child);
+                    initNewAnimal(child, first, second);
                 }
             }
         }
     }
 
-    private void spawnGrass(){
+    private void spawnGrass() {
         final int SPAWN_TRIES = 50;
 
-        for(int i = 0; i < SPAWN_TRIES; i++){
+        for (int i = 0; i < SPAWN_TRIES; i++) {
             var pos = new Vector2d(
                     jungleStart.x + rand.nextInt(jungleSize),
                     jungleStart.y + rand.nextInt(jungleSize)
             );
-            if(grass.contains(pos) || occupiedByAnimals(pos)) continue;
+            if (grass.contains(pos) || occupiedByAnimals(pos)) continue;
 
             grass.add(pos);
-            for(var obs: grassCountChangedObservers) obs.grassCountChanged(1);
+            for (var obs : grassCountChangedObservers) obs.grassCountChanged(1);
             break;
         }
 
-        for(int i = 0; i < SPAWN_TRIES; i++){
+        for (int i = 0; i < SPAWN_TRIES; i++) {
             var pos = new Vector2d(
                     rand.nextInt(size.x),
                     rand.nextInt(size.y)
@@ -199,18 +216,46 @@ public class WorldMap {
             Vector2d jungleRect = jungleStart.add(
                     new Vector2d(jungleSize - 1, jungleSize - 1));
 
-            if(grass.contains(pos) || occupiedByAnimals(pos) ||
+            if (grass.contains(pos) || occupiedByAnimals(pos) ||
                     (pos.follows(jungleStart) && pos.precedes(jungleRect))) {
                 continue;
             }
 
             grass.add(pos);
-            for(var obs: grassCountChangedObservers) obs.grassCountChanged(1);
+            for (var obs : grassCountChangedObservers) obs.grassCountChanged(1);
             break;
         }
     }
 
-    public void updateGrid(){
+    private void handleMagicEvolution() {
+        if (currentMagicEvolution < maxMagicEvolution) {
+            List<Animal> allAnimals = new ArrayList<>();
+            for (var entry : animals.entrySet()) {
+                allAnimals.addAll(entry.getValue());
+            }
+
+            if (allAnimals.size() <= 5) {
+                currentMagicEvolution++;
+
+                for (var animal : allAnimals) {
+
+                    Vector2d pos;
+                    do {
+                        pos = new Vector2d(rand.nextInt(size.x), rand.nextInt(size.y));
+                    } while (occupiedByAnimals(pos));
+
+                    var clone = new Animal(animal);
+                    addAnimal(clone, pos);
+                    initNewAnimal(clone, null, null);
+                }
+            }
+        }
+    }
+
+    public void updateNode() {
+        magicEvolutionLabel.setText(
+                "Magic evolution: " + currentMagicEvolution + " out of " + maxMagicEvolution);
+
         grid.getChildren().clear();
         grid.getColumnConstraints().clear();
         grid.getRowConstraints().clear();
@@ -229,11 +274,11 @@ public class WorldMap {
             addGridLabel(i, 0, i + 1);
         }
 
-        for(var grass : grass){
-                grid.add(getGrassImageView(), grass.x + 1, grass.y + 1);
+        for (var grass : grass) {
+            grid.add(getGrassImageView(), grass.x + 1, grass.y + 1);
         }
 
-        for (var entry: animals.entrySet()) {
+        for (var entry : animals.entrySet()) {
             var pos = entry.getKey();
             var animals = entry.getValue().stream().map(Animal::getImageView).toList();
 
@@ -253,18 +298,25 @@ public class WorldMap {
         }
     }
 
-    private void addAnimal(Animal animal, Vector2d position){
+    private void addAnimal(Animal animal, Vector2d position) {
         if (!animals.containsKey(position)) animals.put(position, new ArrayList<>());
         animals.get(position).add(animal);
     }
 
-    private boolean occupiedByAnimals(Vector2d position){
-        if(!animals.containsKey(position)) return false;
+    private void initNewAnimal(Animal animal, Animal parentA, Animal parentB) {
+        for (var obs : totalEnergyChangedObservers) animal.addEnergyObserver(obs);
+        for (var obs : animalSelectedObservers) animal.addSelectedObserver(obs);
+        for (var obs : animalsReproduceObservers)
+            obs.animalSpawned(parentA, parentB, animal);
+    }
+
+    private boolean occupiedByAnimals(Vector2d position) {
+        if (!animals.containsKey(position)) return false;
         return !animals.get(position).isEmpty();
     }
 
-    private ImageView getGrassImageView(){
-        if (grassImageCache == null){
+    private ImageView getGrassImageView() {
+        if (grassImageCache == null) {
             try {
                 grassImageCache = new Image(new FileInputStream(grassImagePath));
             } catch (FileNotFoundException e) {
@@ -273,7 +325,7 @@ public class WorldMap {
         }
 
         var imageView = new ImageView(grassImageCache);
-        imageView.setEffect(new ColorAdjust(0.7, 1.0, -0.5,0.0));
+        imageView.setEffect(new ColorAdjust(0.7, 1.0, -0.5, 0.0));
         imageView.setFitWidth(20);
         imageView.setFitHeight(20);
         return imageView;
@@ -285,7 +337,12 @@ public class WorldMap {
         grid.add(label, x, y);
     }
 
-    public GridPane getGrid() {
+    public Node getNode() {
+        if (maxMagicEvolution != 0) {
+            var box = new VBox(grid, magicEvolutionLabel);
+            box.setAlignment(Pos.CENTER);
+            return box;
+        }
         return grid;
     }
 }
