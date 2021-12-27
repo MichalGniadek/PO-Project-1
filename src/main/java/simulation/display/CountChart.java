@@ -1,4 +1,10 @@
-package simulation;
+package simulation.display;
+
+import simulation.map.Animal;
+import simulation.map.WorldMap;
+import simulation.events.IAnimalDiedObserver;
+import simulation.events.IAnimalSpawnedObserver;
+import simulation.events.IGrassCountChanged;
 
 public class CountChart extends ChartDisplay implements
         IAnimalSpawnedObserver, IAnimalDiedObserver, IGrassCountChanged {

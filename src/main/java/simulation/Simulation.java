@@ -8,8 +8,9 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import simulation.display.*;
+import simulation.map.WorldMap;
 
 import java.io.BufferedWriter;
 import java.io.File;

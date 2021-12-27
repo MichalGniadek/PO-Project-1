@@ -1,14 +1,19 @@
-package simulation;
+package simulation.display;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import simulation.map.Animal;
+import simulation.map.WorldMap;
+import simulation.events.IAnimalDiedObserver;
+import simulation.events.IAnimalSelected;
+import simulation.events.IAnimalSpawnedObserver;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class SelectedAnimalDisplay extends ChartDisplay implements IAnimalSelected, IAnimalDiedObserver, IAnimalSpawnedObserver{
+public class SelectedAnimalDisplay extends ChartDisplay implements IAnimalSelected, IAnimalDiedObserver, IAnimalSpawnedObserver {
     private final WorldMap map;
     private Animal selected;
     private final Label infoLabel = new Label("");

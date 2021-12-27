@@ -1,4 +1,4 @@
-package simulation;
+package simulation.display;
 
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -6,10 +6,16 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import simulation.map.Animal;
+import simulation.CSVData;
+import simulation.map.Genome;
+import simulation.map.WorldMap;
+import simulation.events.IAnimalDiedObserver;
+import simulation.events.IAnimalSpawnedObserver;
 
 import java.util.*;
 
-public class GenomeDisplay implements Display, IAnimalSpawnedObserver, IAnimalDiedObserver{
+public class GenomeDisplay implements Display, IAnimalSpawnedObserver, IAnimalDiedObserver {
     private final WorldMap map;
     private final Set<Animal> animals = new HashSet<>();
     private final VBox box = new VBox();

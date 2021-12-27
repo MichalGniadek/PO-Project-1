@@ -1,6 +1,11 @@
-package simulation;
+package simulation.display;
 
-public class AverageChildrenChart extends ChartDisplay implements IAnimalDiedObserver, IAnimalSpawnedObserver{
+import simulation.map.Animal;
+import simulation.map.WorldMap;
+import simulation.events.IAnimalDiedObserver;
+import simulation.events.IAnimalSpawnedObserver;
+
+public class AverageChildrenChart extends ChartDisplay implements IAnimalDiedObserver, IAnimalSpawnedObserver {
     private int aliveAnimals = 0;
     private int totalChildren = 0;
 

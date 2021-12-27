@@ -1,7 +1,13 @@
-package simulation;
+package simulation.display;
+
+import simulation.map.Animal;
+import simulation.map.WorldMap;
+import simulation.events.IAnimalDiedObserver;
+import simulation.events.IAnimalSpawnedObserver;
+import simulation.events.ITotalEnergyChanged;
 
 public class EnergyChart extends ChartDisplay
-        implements ITotalEnergyChanged, IAnimalSpawnedObserver, IAnimalDiedObserver{
+        implements ITotalEnergyChanged, IAnimalSpawnedObserver, IAnimalDiedObserver {
     private int animals = 0;
     private int totalEnergy = 0;
 

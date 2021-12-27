@@ -1,4 +1,4 @@
-package simulation;
+package simulation.map;
 
 import java.util.Arrays;
 import java.util.Random;

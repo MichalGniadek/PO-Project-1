@@ -5,7 +5,7 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import simulation.ISimulationStarted;
+import simulation.events.ISimulationStarted;
 import simulation.Simulation;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class App extends Application implements ISimulationStarted {
     public void start(Stage primaryStage) {
         var configuration = new Configuration();
         configuration.AddSimulationStartedObserver(this);
-        mainScene = new Scene(configuration.GetRoot(), 400, 650);
+        mainScene = new Scene(configuration.GetRoot(), 800, 650);
         primaryStage.setScene(mainScene);
         primaryStage.setTitle("Evolution Sandbox");
         primaryStage.show();

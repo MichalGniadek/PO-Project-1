@@ -1,10 +1,11 @@
-package simulation;
+package simulation.display;
 
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import simulation.CSVData;
 
 import java.util.*;
 

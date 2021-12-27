@@ -10,6 +10,9 @@ import javafx.scene.control.Spinner;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import simulation.*;
+import simulation.events.ISimulationStarted;
+import simulation.map.Vector2d;
+import simulation.map.WorldMap;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package simulation;
+package simulation.events;
 
 import gui.Configuration;
 

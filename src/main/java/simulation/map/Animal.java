@@ -1,9 +1,11 @@
-package simulation;
+package simulation.map;
 
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import simulation.events.IAnimalSelected;
+import simulation.events.ITotalEnergyChanged;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

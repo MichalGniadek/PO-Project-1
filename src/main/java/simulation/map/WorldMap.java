@@ -1,4 +1,4 @@
-package simulation;
+package simulation.map;
 
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -8,6 +8,7 @@ import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import simulation.events.*;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

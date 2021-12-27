@@ -1,6 +1,10 @@
-package simulation;
+package simulation.display;
 
-public class LifeExpectancyChart extends ChartDisplay implements IAnimalDiedObserver{
+import simulation.map.Animal;
+import simulation.map.WorldMap;
+import simulation.events.IAnimalDiedObserver;
+
+public class LifeExpectancyChart extends ChartDisplay implements IAnimalDiedObserver {
     private int deadAnimals = 0;
     private int totalLife = 0;
 
